@@ -3,7 +3,7 @@
 **Prometheus Remote Storage support requires [VictoriaMetrics support][victoriametrics-pull-request].**
 
 [Prometheus](https://github.com/prometheus/prometheus) is a monitoring system and time series database.
-Prometheus offers a set of interfaces that allow integrating with remote storage systems.
+Prometheus offers a set of interfaces that allow integrating with remote storage systems
 (see [Remote Storage integrations](https://prometheus.io/docs/prometheus/latest/storage/#remote-storage-integrations)).
 This additional guide explains how the data generated for the TSBS is stored,
 additional flags available when using the data importer (`tsbs_load_prometheus`),
@@ -39,6 +39,7 @@ FORMATS=influx SCALE=100 TS_START=2019-12-01T00:00:00Z TS_END=2019-12-15T00:00:0
 
 One of the ways to load data in Prometheus Remote Storage is to use `scripts/load_prometheus.sh`:
 ```text
+DATA_FILE=/tmp/bulk_data/data_influx_cpu-only_100_2019-12-01T00:00:00Z_2019-12-15T00:00:00Z_10s_123.dat.gz \
 REMOTE_URL=http://localhost:1234/write ./scripts/load_prometheus.sh
 ```
 > Assumed that Prometheus Remote Storage is already installed and ready for insertion on the `REMOTE_URL` url.
@@ -75,7 +76,7 @@ This section uses `tsbs_run_queries_victoriametrics`
 It is necessary to have a Prometheus installed with the following minimum configuration:
 ```yaml
 remote_read:
-  - url: "http://localhost:1111/read" # Remote Storage read URL
+  - url: "http://localhost:1234/read" # Remote Storage read URL
     read_recent: true
 ```
 
@@ -84,6 +85,6 @@ To run generated queries follow examples in documentation:
 cat /tmp/bulk_queries/victoriametrics-cpu-max-all-8-queries.gz | gunzip | tsbs_run_queries_victoriametrics -urls http://localhost:9090
 ```
 > Assumed that Prometheus is ready for querying on the `localhost` host and the `9090` port.
-> Change '-urls http://localhost:9090' if this is not the case.
+> Change `-urls http://localhost:9090` if this is not the case.
 
 [victoriametrics-pull-request]: https://github.com/timescale/tsbs/pull/96

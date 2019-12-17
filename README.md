@@ -13,6 +13,7 @@ Current databases supported:
 + ClickHouse [(supplemental docs)](docs/clickhouse.md)
 + CrateDB [(supplemental docs)](docs/cratedb.md)
 + SiriDB [(supplemental docs)](docs/siridb.md)
++ Prometheus Remote Storage [(supplemental docs)](docs/prometheus.md)
 
 ## Overview
 
