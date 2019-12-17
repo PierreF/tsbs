@@ -40,13 +40,13 @@ FORMATS=influx SCALE=100 TS_START=2019-12-01T00:00:00Z TS_END=2019-12-15T00:00:0
 One of the ways to load data in Prometheus Remote Storage is to use `scripts/load_prometheus.sh`:
 ```text
 DATA_FILE=/tmp/bulk_data/data_influx_cpu-only_100_2019-12-01T00:00:00Z_2019-12-15T00:00:00Z_10s_123.dat.gz \
-REMOTE_URL=http://localhost:1234/write ./scripts/load_prometheus.sh
+REMOTE_URL=http://localhost:9201/write ./scripts/load_prometheus.sh
 ```
 > Assumed that Prometheus Remote Storage is already installed and ready for insertion on the `REMOTE_URL` url.
 
 ### Additional Flags
 
-#### `-urls` (type: `string`, default: `http://localhost:1234/write`)
+#### `-urls` (type: `string`, default: `http://localhost:9201/write`)
 
 Comma-separated list of URLs to connect to for inserting data. It can be
 just a single-version URL or list of VMInsert URLs. Workers will be
@@ -76,7 +76,7 @@ This section uses `tsbs_run_queries_victoriametrics`
 It is necessary to have a Prometheus installed with the following minimum configuration:
 ```yaml
 remote_read:
-  - url: "http://localhost:1234/read" # Remote Storage read URL
+  - url: "http://localhost:9201/read" # Remote Storage read URL
     read_recent: true
 ```
 
