@@ -12,6 +12,7 @@ Current databases supported:
 + CrateDB [(supplemental docs)](docs/cratedb.md)
 + InfluxDB [(supplemental docs)](docs/influx.md)
 + MongoDB [(supplemental docs)](docs/mongo.md)
++ Prometheus Remote Storage [(supplemental docs)](docs/prometheus.md)
 + SiriDB [(supplemental docs)](docs/siridb.md)
 + TimescaleDB [(supplemental docs)](docs/timescaledb.md)
 + VictoriaMetrics [(supplemental docs)](docs/victoriametrics.md)
