@@ -29,7 +29,7 @@ func init() {
 	var config load.BenchmarkRunnerConfig
 
 	config.AddToFlagSet(pflag.CommandLine)
-	pflag.String("urls", "http://localhost:1234/write", "Prometheus remote storage URLs")
+	pflag.String("urls", "http://localhost:9201/write", "Prometheus remote storage URLs")
 	pflag.Parse()
 
 	err := utils.SetupConfigFile()
