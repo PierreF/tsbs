@@ -1,3 +1,4 @@
+// tsbs_load_prometheus loads a Prometheus remote storage with data from stdin.
 package main
 
 import (
@@ -23,16 +24,12 @@ var (
 	loader *load.BenchmarkRunner
 )
 
-// allows for testing
-var fatal = log.Fatalf
-
+// Parse args:
 func init() {
 	var config load.BenchmarkRunnerConfig
 
 	config.AddToFlagSet(pflag.CommandLine)
-
-	pflag.String("urls", "http://localhost:1234", "Prometheus remote storage URLs")
-
+	pflag.String("urls", "http://localhost:1234/write", "Prometheus remote storage URLs")
 	pflag.Parse()
 
 	err := utils.SetupConfigFile()
@@ -48,7 +45,7 @@ func init() {
 	remoteURLsStr := viper.GetString("urls")
 
 	if len(remoteURLsStr) == 0 {
-		fatal(errMissingURLsFlag)
+		log.Fatalf(errMissingURLsFlag)
 	}
 
 	remoteURLs = strings.Split(remoteURLsStr, ",")

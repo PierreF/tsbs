@@ -5,21 +5,31 @@ import (
 	"github.com/timescale/tsbs/load"
 
 	"bytes"
+	"log"
 	"net/http"
+	"time"
 )
 
 const (
 	errMarshal     = "marshal error: can't marshal write request: %v"
 	errNewRequest  = "request error: can't create new request: %v"
 	errSendRequest = "request error: can't send request: %v"
-	errCloseBody   = "request error: can't close response body"
+	errCloseBody   = "request error: can't close response body: %v"
 )
 
+const timeout = 30 * time.Second
+
 type processor struct {
-	url string
+	client *http.Client
+	url    string
 }
 
 func (p *processor) Init(workerNum int, _ bool) {
+	client := &http.Client{
+		Timeout: timeout,
+	}
+
+	p.client = client
 	p.url = remoteURLs[workerNum%(len(remoteURLs))]
 }
 
@@ -33,27 +43,27 @@ func (p *processor) ProcessBatch(b load.Batch, doLoad bool) (metricCount, rowCou
 	marshal, err := batch.writeRequest.Marshal()
 
 	if err != nil {
-		fatal(errMarshal, err)
+		log.Fatalf(errMarshal, err)
 	}
 
 	encoded := snappy.Encode(nil, marshal)
-	request, err := http.NewRequest("POST", p.url+"/write", bytes.NewBuffer(encoded))
+	request, err := http.NewRequest("POST", p.url, bytes.NewBuffer(encoded))
 
 	if err != nil {
-		fatal(errNewRequest, err)
+		log.Fatalf(errNewRequest, err)
 	}
 
 	request.Header.Set("Content-Encoding", "snappy")
 	request.Header.Set("Content-Type", "application/x-protobuf")
 
-	response, err := http.DefaultClient.Do(request)
+	response, err := p.client.Do(request)
 
 	if err != nil {
-		fatal(errSendRequest, err)
+		log.Fatalf(errSendRequest, err)
 	}
 
 	if err := response.Body.Close(); err != nil {
-		fatal(errCloseBody, err)
+		log.Fatalf(errCloseBody, err)
 	}
 
 	return batch.metrics, batch.rows

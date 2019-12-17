@@ -5,6 +5,7 @@ import (
 	"github.com/timescale/tsbs/load"
 
 	"bufio"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -25,8 +26,7 @@ func (d *decoder) Decode(_ *bufio.Reader) *load.Point {
 	if !ok && d.scanner.Err() == nil { // nothing scanned & no error = EOF
 		return nil
 	} else if !ok {
-		fatal("scan error: %v", d.scanner.Err())
-		return nil
+		log.Fatalf("scan error: %v", d.scanner.Err())
 	}
 
 	return load.NewPoint(d.scanner.Bytes())
@@ -45,65 +45,65 @@ func (b *batch) Len() int {
 func (b *batch) Append(item *load.Point) {
 	that := item.Data.([]byte)
 	thatStr := string(that)
-	b.rows++
 
 	args := strings.Split(thatStr, " ")
+
 	if len(args) != 3 {
-		fatal(errNotThreeTuplesFmt, len(args))
-		return
+		log.Fatalf(errNotThreeTuplesFmt, len(args))
 	}
 
 	timestamp, err := strconv.ParseInt(args[2], 10, 64)
 
 	if err != nil {
-		fatal(errNotInteger, err)
+		log.Fatalf(errNotInteger, err)
 	}
 
-	commonLabels := strings.Split(args[0], ",")
-	commonLabelPrefix, commonLabels := commonLabels[0], commonLabels[1:]
-	commonPromLabels := make([]*prompb.Label, 0, len(commonLabels))
+	// Convert InfluxDB tags to Prometheus labels
+	tags := strings.Split(args[0], ",")
+	measurement, tags := tags[0], tags[1:]
+	commonPromLabels := make([]*prompb.Label, 0, len(tags))
 
-	for _, commonLabelStr := range commonLabels {
-		commonLabel := strings.Split(commonLabelStr, "=")
-		commonLabelName := commonLabel[0]
-		commonLabelValue := commonLabel[1]
+	for _, tagStr := range tags {
+		tag := strings.Split(tagStr, "=")
+		tagKey := tag[0]
+		tagValue := tag[1]
 
 		commonPromLabel := &prompb.Label{
-			Name:  commonLabelName,
-			Value: commonLabelValue,
+			Name:  tagKey,
+			Value: tagValue,
 		}
 
 		commonPromLabels = append(commonPromLabels, commonPromLabel)
 	}
 
-	labelValues := strings.Split(args[1], ",")
+	// Convert InfluxDB field-value pairs to Prometheus '__name__' label and associated sample
+	fieldValuePairs := strings.Split(args[1], ",")
 
-	for _, metricStr := range labelValues {
+	for _, fieldValuePairStr := range fieldValuePairs {
+		fieldValuePair := strings.Split(fieldValuePairStr, "=")
+		field := fieldValuePair[0]
 		promLabels := make([]*prompb.Label, len(commonPromLabels))
 
 		copy(promLabels, commonPromLabels)
 
-		labelValue := strings.Split(metricStr, "=")
-		label := labelValue[0]
-
 		promLabel := &prompb.Label{
 			Name:  "__name__",
-			Value: commonLabelPrefix + "_" + label,
+			Value: measurement + "_" + field,
 		}
 
 		promLabels = append(promLabels, promLabel)
 
-		valueClean := strings.ReplaceAll(labelValue[1], "i", "")
-		value, err := strconv.ParseFloat(valueClean, 64)
+		valueStr := strings.Replace(fieldValuePair[1], "i", "", 1) // Remove appended 'i' specific to InfluxDB
+		value, err := strconv.ParseFloat(valueStr, 64)
 
 		if err != nil {
-			fatal(errNotFloat, err)
+			log.Fatalf(errNotFloat, err)
 		}
 
 		promSamples := []prompb.Sample{
 			{
 				Value:     value,
-				Timestamp: timestamp / 1000000,
+				Timestamp: timestamp / 1000000, // Convert nanoseconds to milliseconds
 			},
 		}
 
@@ -116,6 +116,8 @@ func (b *batch) Append(item *load.Point) {
 
 		b.metrics++
 	}
+
+	b.rows++
 }
 
 type factory struct{}
