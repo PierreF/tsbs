@@ -39,7 +39,6 @@ FORMATS=influx SCALE=100 TS_START=2019-12-01T00:00:00Z TS_END=2019-12-15T00:00:0
 
 One of the ways to load data in Prometheus Remote Storage is to use `scripts/load_prometheus.sh`:
 ```text
-DATA_FILE=/tmp/bulk_data/data_influx_cpu-only_100_2019-12-01T00:00:00Z_2019-12-15T00:00:00Z_10s_123.dat.gz \
 REMOTE_URL=http://localhost:9201/write ./scripts/load_prometheus.sh
 ```
 > Assumed that Prometheus Remote Storage is already installed and ready for insertion on the `REMOTE_URL` url.

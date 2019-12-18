@@ -8,7 +8,8 @@ if [[ -z "$EXE_FILE_NAME" ]]; then
 fi
 
 # Load parameters - common
-DATA_FILE_NAME=${DATA_FILE_NAME:-prometheus-data.gz}
+DATA_FILE_NAME=${DATA_FILE_NAME:-influx-data.gz}
+REMOTE_URL=${REMOTE_URL:-http://localhost:9201/write}
 
 EXE_DIR=${EXE_DIR:-$(dirname $0)}
 source ${EXE_DIR}/load_common.sh
