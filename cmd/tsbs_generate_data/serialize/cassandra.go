@@ -20,6 +20,9 @@ func (s *CassandraSerializer) Serialize(p *Point, w io.Writer) (err error) {
 	seriesIDPrefix := make([]byte, 0, 256)
 	seriesIDPrefix = append(seriesIDPrefix, p.measurementName...)
 	for i := 0; i < len(p.tagKeys); i++ {
+		if p.tagValues[i] == nil {
+			continue
+		}
 		switch t := p.tagValues[i].(type) {
 		case string:
 			seriesIDPrefix = append(seriesIDPrefix, ',')

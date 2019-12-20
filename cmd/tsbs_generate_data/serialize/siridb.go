@@ -36,6 +36,9 @@ func (s *SiriDBSerializer) Serialize(p *Point, w io.Writer) error {
 		if i != 0 {
 			line = append(line, ',')
 		}
+		if v == nil {
+			continue
+		}
 		switch t := v.(type) {
 		case string:
 			line = append(line, p.tagKeys[i]...)
