@@ -55,6 +55,7 @@ func (p *processor) ProcessBatch(b load.Batch, doLoad bool) (metricCount, rowCou
 
 	request.Header.Set("Content-Encoding", "snappy")
 	request.Header.Set("Content-Type", "application/x-protobuf")
+	request.Header.Set("X-Prometheus-Remote-Write-Version", "2.0.0")
 
 	response, err := p.client.Do(request)
 
