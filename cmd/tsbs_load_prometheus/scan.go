@@ -1,6 +1,8 @@
 package main
 
 import (
+	"sort"
+
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/timescale/tsbs/load"
 
@@ -63,6 +65,7 @@ func (b *batch) Append(item *load.Point) {
 	measurement, tags := tags[0], tags[1:]
 	commonPromLabels := make([]*prompb.Label, 0, len(tags))
 
+	sort.Strings(tags)
 	for _, tagStr := range tags {
 		tag := strings.Split(tagStr, "=")
 		tagKey := tag[0]
@@ -82,9 +85,7 @@ func (b *batch) Append(item *load.Point) {
 	for _, fieldValuePairStr := range fieldValuePairs {
 		fieldValuePair := strings.Split(fieldValuePairStr, "=")
 		field := fieldValuePair[0]
-		promLabels := make([]*prompb.Label, len(commonPromLabels))
-
-		copy(promLabels, commonPromLabels)
+		promLabels := make([]*prompb.Label, 0, len(commonPromLabels))
 
 		promLabel := &prompb.Label{
 			Name:  "__name__",
@@ -92,6 +93,7 @@ func (b *batch) Append(item *load.Point) {
 		}
 
 		promLabels = append(promLabels, promLabel)
+		promLabels = append(promLabels, commonPromLabels...)
 
 		valueStr := strings.Replace(fieldValuePair[1], "i", "", 1) // Remove appended 'i' specific to InfluxDB
 		value, err := strconv.ParseFloat(valueStr, 64)
