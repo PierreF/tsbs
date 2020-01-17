@@ -239,12 +239,16 @@ func (g *DataGenerator) getSerializer(sim common.Simulator, format string) (seri
 	switch format {
 	case FormatCassandra:
 		ret = &serialize.CassandraSerializer{}
+	case FormatVictoriaMetrics:
+		ret = &serialize.InfluxSerializer{}
 	case FormatInflux:
 		ret = &serialize.InfluxSerializer{}
 	case FormatMongo:
 		ret = &serialize.MongoSerializer{}
 	case FormatSiriDB:
 		ret = &serialize.SiriDBSerializer{}
+	case FormatAkumuli:
+		ret = serialize.NewAkumuliSerializer()
 	case FormatCrateDB:
 		g.writeHeader(sim)
 		ret = &serialize.CrateDBSerializer{}
