@@ -51,6 +51,7 @@ const (
 	useCaseCPUSingle = "cpu-single"
 	useCaseDevops    = "devops"
 	useCaseIoT       = "iot"
+	useCaseIoTCustom = "iot-custom"
 )
 
 var useCaseChoices = []string{
@@ -58,6 +59,7 @@ var useCaseChoices = []string{
 	useCaseCPUSingle,
 	useCaseDevops,
 	useCaseIoT,
+	useCaseIoTCustom,
 }
 
 // ParseUTCTime parses a string-represented time of the format 2006-01-02T15:04:05Z07:00
